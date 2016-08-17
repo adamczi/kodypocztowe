@@ -197,8 +197,6 @@ class kodypocztowe:
             return 'keyerror'
 
     def createShapefile(self):
-        ## Get current EPSG
-        currentEPSG = self.canvas.mapRenderer().destinationCrs().authid()
         ## Get GeoJSON data from request
         geojson = self.requestAPI(self.code)
 
@@ -211,6 +209,14 @@ class kodypocztowe:
             tempPolygons.append([tempPoints])        
         ## ... and store them in MultiPolygon geometry
         geom = QgsGeometry.fromMultiPolygon(tempPolygons)
+
+        ## Get current EPSG and apply transformation if needed
+        currentEPSG = self.canvas.mapRenderer().destinationCrs().authid()
+        if currentEPSG != 'EPSG:2180':
+            crsSrc = QgsCoordinateReferenceSystem(2180)    # WGS 84
+            crsDest = QgsCoordinateReferenceSystem(int(currentEPSG[5:]))
+            xform = QgsCoordinateTransform(crsSrc, crsDest)
+            geom.transform(xform)
 
         ## Set appropriate layer and name parameters
         if self.dlg.radioButton_1.isChecked():
@@ -245,14 +251,10 @@ class kodypocztowe:
         """ Checks if code input is valid """
         self.code = self.dlg.lineEdit.text()
         pattern = '^[0-9]{2}-[0-9]{3}$'
-        pattern2 = '^[0-9]{2}[0-9]{3}$'
         if re.match(pattern, self.code, flags=0) != None:
-            return self.code
-        elif re.match(pattern2, self.code, flags=0) != None:
-            self.code = self.code[:2]+'-'+self.code[2:]
             return self.code                
         else: 
-            return 'Nieprawidlowy kod pocztowy'        
+            return 'invalid code'        
 
     def run(self):
         """Run method that performs all the real work"""
@@ -264,12 +266,10 @@ class kodypocztowe:
         result = self.dlg.exec_()
         # See if OK was pressed
         if result:
-            if self.codeCheck() != 'Nieprawidlowy kod pocztowy': # if code string valid
+            if self.codeCheck() != 'invalid code': # if code string valid
                 if self.requestAPI(self.code) != 'keyerror': # if code exists
                     self.createShapefile() # do things
                 else:
                     self.iface.messageBar().pushMessage("Error", "Taki kod nie istnieje w bazie", level=QgsMessageBar.WARNING, duration=3)
-                    pass
             else:
                 self.iface.messageBar().pushMessage("Error", "Nieprawidlowy kod pocztowy", level=QgsMessageBar.WARNING, duration=3)
-                pass

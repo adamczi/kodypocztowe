@@ -22,4 +22,4 @@ def index(code):
 
 if __name__ == '__main__':
     app.secret_key = keySecret
-    app.run(debug = True)
+    app.run()
