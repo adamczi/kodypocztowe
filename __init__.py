@@ -6,8 +6,8 @@
  Returns centroids or geometries of postal code areas
                              -------------------
         begin                : 2016-08-16
-        copyright            : (C) 2016 by Adam Borczyk, Bartosz Ligęza
-        email                : ad.borczyk@gmail.com, ligeza.bartosz@gmail.com
+        copyright            : (C) 2016 by Adam Borczyk
+        email                : ad.borczyk@gmail.com
         git sha              : $Format:%H$
  ***************************************************************************/
 

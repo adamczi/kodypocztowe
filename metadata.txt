@@ -11,8 +11,8 @@ name=Kody pocztowe
 qgisMinimumVersion=2.0
 description=Returns centroids or geometries of postal code areas
 version=0.1
-author=Adam Borczyk, Bartosz Ligęza
-email=ad.borczyk@gmail.com, ligeza.bartosz@gmail.com
+author=Adam Borczyk
+email=ad.borczyk@gmail.com
 
 about=Returns centroids or geometries of Polish postal areas
 
@@ -26,7 +26,7 @@ repository=https://github.com/adamczi/kodypocztowe
 # changelog=
 
 # Tags are comma separated with spaces allowed
-tags=
+tags=kod pocztowy, kody pocztowe, poczta
 
 homepage=https://github.com/adamczi/kodypocztowe
 category=Plugins

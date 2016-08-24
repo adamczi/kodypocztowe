@@ -7,8 +7,8 @@
                               -------------------
         begin                : 2016-08-16
         git sha              : $Format:%H$
-        copyright            : (C) 2016 by Adam Borczyk, Bartosz Ligęza
-        email                : ad.borczyk@gmail.com, ligeza.bartosz@gmail.com
+        copyright            : (C) 2016 by Adam Borczyk
+        email                : ad.borczyk@gmail.com
  ***************************************************************************/
 
 /***************************************************************************
