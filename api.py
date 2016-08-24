@@ -1,6 +1,5 @@
 # coding: utf-8 
-from flask import Flask, session, render_template, request, redirect, jsonify
-import urllib
+from flask import Flask, jsonify
 from config import keySecret
 from db import *
 from models import *

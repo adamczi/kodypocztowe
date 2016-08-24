@@ -65,8 +65,8 @@ class kodypocztowe:
             if qVersion() > '4.3.3':
                 QCoreApplication.installTranslator(self.translator)
 
-        # Create the dialog (after translation) and keep reference
-        self.dlg = kodypocztoweDialog()
+        # Create the dialog (after translation) and keep reference, window on top
+        self.dlg = kodypocztoweDialog(self.iface.mainWindow())
 
         # Declare instance attributes
         self.actions = []
