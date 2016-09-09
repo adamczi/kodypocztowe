@@ -187,14 +187,17 @@ class kodypocztowe:
     def requestAPI(self, code):
         """ Send the request """
         queryString = 'http://127.0.0.1:5000/%s' % code
-        ## Get the data
-        response = urllib.urlopen(queryString)
-        data = json.loads(response.read())
-        if data != code: # if exists in database
-            self.coords = data['coordinates']            
-            return data
-        else:    
-            return 'keyerror'
+        try:
+            ## Get the data
+            response = urllib.urlopen(queryString)
+            data = json.loads(response.read())
+            if data != code: # if exists in database
+                self.coords = data['coordinates']            
+                return data            
+            else:    
+                return 'keyerror'
+        except IOError:
+            return 'db_error'
 
     def createShapefile(self):
         ## Get GeoJSON data from request
@@ -219,13 +222,11 @@ class kodypocztowe:
             geom.transform(xform)
 
         ## Set appropriate layer and name parameters
+        layerType = 'Point' if self.dlg.radioButton_1.isChecked() else 'Multipolygon'
+        name = '_centr' if self.dlg.radioButton_1.isChecked() else '_geom'
         if self.dlg.radioButton_1.isChecked():
-            layerType = 'Point'
             geom = geom.centroid()
-            name = '_centr'
-        else:
-            layerType = 'Multipolygon'
-            name = '_geom'
+
 
         ## Create vector layer
         vl = QgsVectorLayer("%s?crs=%s" % (layerType, currentEPSG), self.code+'%s' % name, "memory") 
@@ -267,9 +268,11 @@ class kodypocztowe:
         # See if OK was pressed
         if result:
             if self.codeCheck() != 'invalid code': # if code string valid
-                if self.requestAPI(self.code) != 'keyerror': # if code exists
-                    self.createShapefile() # do things
-                else:
+                if self.requestAPI(self.code) == 'keyerror': # if code exists
                     self.iface.messageBar().pushMessage("Error", "Taki kod nie istnieje w bazie", level=QgsMessageBar.WARNING, duration=3)
+                elif self.requestAPI(self.code) == 'db_error':
+                    self.iface.messageBar().pushMessage("Error", u"Brak połączenia z bazą danych", level=QgsMessageBar.CRITICAL, duration=3)
+                else:
+                    self.createShapefile() # do things
             else:
-                self.iface.messageBar().pushMessage("Error", "Nieprawidlowy kod pocztowy", level=QgsMessageBar.WARNING, duration=3)
+                self.iface.messageBar().pushMessage("Error", u"Nieprawidłowy kod pocztowy", level=QgsMessageBar.WARNING, duration=3)
