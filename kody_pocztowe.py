@@ -275,4 +275,4 @@ class kodypocztowe:
                 else:
                     self.createShapefile() # do things
             else:
-                self.iface.messageBar().pushMessage("Error", u"Nieprawidłowy kod pocztowy", level=QgsMessageBar.WARNING, duration=3)
+                self.iface.messageBar().pushMessage("Error", u"Nieprawidłowy kod pocztowy!", level=QgsMessageBar.WARNING, duration=3)
