@@ -21,7 +21,7 @@
  ***************************************************************************/
 """
 from PyQt4.QtCore import QSettings, QTranslator, qVersion, QCoreApplication, QVariant
-from PyQt4.QtGui import QAction, QIcon
+from PyQt4.QtGui import QAction, QIcon, QToolBar
 from qgis.core import QgsField, QgsVectorLayer, QgsFeature, QgsGeometry, QgsPoint, QgsMapLayerRegistry, QgsCoordinateReferenceSystem, QgsCoordinateTransform
 from qgis.gui import QgsMessageBar
 # Initialize Qt resources from file resources.py
@@ -70,10 +70,15 @@ class kodypocztowe:
 
         # Declare instance attributes
         self.actions = []
-        self.menu = self.tr(u'&Kody pocztowe')
-        # TODO: We are going to let the user set this up in a future iteration
-        self.toolbar = self.iface.addToolBar(u'kodypocztowe')
-        self.toolbar.setObjectName(u'kodypocztowe')
+        self.menu = self.tr(u'&Location Intelligence')
+
+        ## Add to LI tooblar or create if doesn't exist
+        toolbarName = 'Location Intelligence'
+        self.toolbar = self.iface.mainWindow().findChild(QToolBar,toolbarName)
+        print self.toolbar
+        if self.toolbar is None:
+            self.toolbar = self.iface.addToolBar(toolbarName)
+            self.toolbar.setObjectName(toolbarName)            
 
     # noinspection PyMethodMayBeStatic
     def tr(self, message):
@@ -181,23 +186,24 @@ class kodypocztowe:
                 self.tr(u'&Kody pocztowe'),
                 action)
             self.iface.removeToolBarIcon(action)
+
         # remove the toolbar
-        del self.toolbar
+        if len(self.toolbar.actions())==0:
+            del self.toolbar
 
     def requestAPI(self, code):
         """ Send the request """
-        queryString = 'http://127.0.0.1:5000/%s' % code
+        queryString = 'http://zip.gis-support.pl/%s' % code
         try:
             ## Get the data
             response = urllib.urlopen(queryString)
             data = json.loads(response.read())
-            if data != code: # if exists in database
-                self.coords = data['coordinates']            
-                return data            
-            else:    
-                return 'keyerror'
+            self.coords = data['coordinates']            
+            return data            
         except IOError:
             return 'db_error'
+        except ValueError:
+            return 'keyerror'
 
     def createShapefile(self):
         ## Get GeoJSON data from request
@@ -215,8 +221,8 @@ class kodypocztowe:
 
         ## Get current EPSG and apply transformation if needed
         currentEPSG = self.canvas.mapRenderer().destinationCrs().authid()
-        if currentEPSG != 'EPSG:2180':
-            crsSrc = QgsCoordinateReferenceSystem(2180)    # WGS 84
+        if currentEPSG != 'EPSG:4326':
+            crsSrc = QgsCoordinateReferenceSystem(4326)    # WGS 84
             crsDest = QgsCoordinateReferenceSystem(int(currentEPSG[5:]))
             xform = QgsCoordinateTransform(crsSrc, crsDest)
             geom.transform(xform)
