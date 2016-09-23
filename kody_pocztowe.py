@@ -200,10 +200,10 @@ class kodypocztowe:
             data = json.loads(response.read())
             self.coords = data['coordinates']            
             return data            
-        except IOError:
-            return 'db_error'
-        except ValueError:
+        except 404:
             return 'keyerror'
+        except: #IOError, etc
+            return 'db_error'            
 
     def createShapefile(self):
         ## Get GeoJSON data from request
